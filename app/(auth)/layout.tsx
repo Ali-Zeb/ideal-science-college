@@ -26,7 +26,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               ))}
             </ul>
           </div>
-          <p className="text-sm text-white/60">Serai Naurang · District Lakki Marwat · Khyber Pakhtunkhwa</p>
+          <p className="text-sm text-white/60">
+            Serai Naurang · District Lakki Marwat · Khyber Pakhtunkhwa
+            <span className="mt-1 block text-xs text-white/45">
+              Software made by <span className="font-semibold text-gold-400">Ali Zeb</span>
+            </span>
+          </p>
         </div>
       </aside>
       <main className="flex flex-col bg-muted/30 px-4 py-8 sm:px-8">

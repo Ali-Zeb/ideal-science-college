@@ -145,7 +145,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
       <div className="relative border-t border-white/10">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-xs sm:flex-row">
           <p>
-            © {year} {settings.siteName}. All rights reserved.
+            © {year} {settings.siteName}. All rights reserved. · Software made by{" "}
+            <span className="font-semibold text-gold-400">Ali Zeb</span>
           </p>
           <div className="flex gap-5">
             <Link href="/privacy-policy" className="hover:text-white">Privacy</Link>

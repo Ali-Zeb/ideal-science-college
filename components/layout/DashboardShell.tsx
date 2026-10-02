@@ -175,6 +175,9 @@ export function DashboardShell({ area, user, badges, showAdminLink, children }: 
       <Link href="/" target="_blank" className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-white">
         <ExternalLink className="size-4" aria-hidden /> View website
       </Link>
+      <p className="mt-3 border-t border-white/10 px-3 pt-3 text-[11px] text-sidebar-foreground/50">
+        Software made by <span className="font-semibold text-sidebar-primary">Ali Zeb</span>
+      </p>
     </div>
   );
 
