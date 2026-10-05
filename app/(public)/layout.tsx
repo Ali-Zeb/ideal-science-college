@@ -20,7 +20,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <Navbar admissionsOpen={settings.admissionsOpen} />
       <main id="main">{children}</main>
       <Footer settings={settings} />
-      <ChatAssistant />
+      {process.env.ANTHROPIC_API_KEY ? <ChatAssistant /> : null}
     </>
   );
 }
