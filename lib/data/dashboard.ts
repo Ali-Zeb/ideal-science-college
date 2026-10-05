@@ -43,6 +43,9 @@ import type {
   StudentAccount,
 } from "@/types";
 
+/** Wing filter from applicationScope(); empty for staff who see both wings. */
+type AppScope = { wing?: "boys" | "girls" };
+
 const isId = (id: string) => Types.ObjectId.isValid(id) && /^[a-f\d]{24}$/i.test(id);
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const pageOf = (page?: string) => Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
@@ -65,25 +68,25 @@ export interface CollegeOverview {
 }
 
 /** Numbers and recent activity for the College dashboard home. */
-export function getCollegeOverview(): Promise<CollegeOverview> {
+export function getCollegeOverview(scope: AppScope = {}): Promise<CollegeOverview> {
   return dbQuery(async () => {
     const weekAgo = new Date(Date.now() - 7 * 864e5);
     const eightWeeksAgo = new Date(Date.now() - 56 * 864e5);
 
     const [statusAgg, wingAgg, thisWeek, weeklyAgg, unreadMessages, newsCount, upcomingEvents, newJobApplicants, recentApps, recentMsgs] =
       await Promise.all([
-        Application.aggregate<{ _id: string; count: number }>([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
-        Application.aggregate<{ _id: string; count: number }>([{ $group: { _id: "$wing", count: { $sum: 1 } } }]),
-        Application.countDocuments({ createdAt: { $gte: weekAgo } }),
+        Application.aggregate<{ _id: string; count: number }>([{ $match: scope }, { $group: { _id: "$status", count: { $sum: 1 } } }]),
+        Application.aggregate<{ _id: string; count: number }>([{ $match: scope }, { $group: { _id: "$wing", count: { $sum: 1 } } }]),
+        Application.countDocuments({ ...scope, createdAt: { $gte: weekAgo } }),
         Application.aggregate<{ _id: { y: number; w: number }; count: number }>([
-          { $match: { createdAt: { $gte: eightWeeksAgo } } },
+          { $match: { ...scope, createdAt: { $gte: eightWeeksAgo } } },
           { $group: { _id: { y: { $isoWeekYear: "$createdAt" }, w: { $isoWeek: "$createdAt" } }, count: { $sum: 1 } } },
         ]),
         Contact.countDocuments({ isRead: false }),
         News.countDocuments({}),
         Event.countDocuments({ published: true, endDate: { $gte: new Date() } }),
         JobApplication.countDocuments({ status: "new" }),
-        Application.find().sort({ createdAt: -1 }).limit(6).populate("program", "name slug").lean(),
+        Application.find(scope).sort({ createdAt: -1 }).limit(6).populate("program", "name slug").lean(),
         Contact.find().sort({ createdAt: -1 }).limit(5).lean(),
       ]);
 
@@ -175,10 +178,12 @@ export interface ApplicationFilters {
   page?: string;
 }
 
-function applicationFilter(f: ApplicationFilters) {
+function applicationFilter(f: ApplicationFilters, scope: AppScope) {
   const filter: Record<string, unknown> = {};
   if (f.status && (APPLICATION_STATUSES as readonly string[]).includes(f.status)) filter.status = f.status;
   if (f.wing === "boys" || f.wing === "girls") filter.wing = f.wing;
+  // The staff member's own wing always wins over the URL filter.
+  if (scope.wing) filter.wing = filter.wing && filter.wing !== scope.wing ? "__none__" : scope.wing;
   if (f.program && isId(f.program)) filter.program = f.program;
   if (f.q?.trim()) {
     const rx = new RegExp(escapeRegex(f.q.trim()), "i");
@@ -188,10 +193,13 @@ function applicationFilter(f: ApplicationFilters) {
 }
 
 /** Paginated, filterable admission applications. */
-export function listApplications(f: ApplicationFilters): Promise<Paginated<ApplicationItem> & { counts: Record<string, number> }> {
+export function listApplications(
+  f: ApplicationFilters,
+  scope: AppScope = {},
+): Promise<Paginated<ApplicationItem> & { counts: Record<string, number> }> {
   return dbQuery(async () => {
     const page = pageOf(f.page);
-    const filter = applicationFilter(f);
+    const filter = applicationFilter(f, scope);
     const [docs, total, statusAgg] = await Promise.all([
       Application.find(filter)
         .sort({ createdAt: -1 })
@@ -200,25 +208,25 @@ export function listApplications(f: ApplicationFilters): Promise<Paginated<Appli
         .populate("program", "name slug")
         .lean(),
       Application.countDocuments(filter),
-      Application.aggregate<{ _id: string; count: number }>([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      Application.aggregate<{ _id: string; count: number }>([{ $match: scope }, { $group: { _id: "$status", count: { $sum: 1 } } }]),
     ]);
     return { ...paginate(docs.map(serializeApplication), total, page), counts: Object.fromEntries(statusAgg.map((s) => [s._id, s.count])) };
   });
 }
 
 /** All applications matching filters (for CSV export, capped at 5000). */
-export function exportApplications(f: ApplicationFilters): Promise<ApplicationItem[]> {
+export function exportApplications(f: ApplicationFilters, scope: AppScope = {}): Promise<ApplicationItem[]> {
   return dbQuery(async () => {
-    const docs = await Application.find(applicationFilter(f)).sort({ createdAt: -1 }).limit(5000).populate("program", "name slug").lean();
+    const docs = await Application.find(applicationFilter(f, scope)).sort({ createdAt: -1 }).limit(5000).populate("program", "name slug").lean();
     return docs.map(serializeApplication);
   });
 }
 
-/** One application by id (staff view). */
-export function getApplication(id: string): Promise<ApplicationItem | null> {
+/** One application by id (staff view), only if it is within the staff member's wing. */
+export function getApplication(id: string, scope: AppScope = {}): Promise<ApplicationItem | null> {
   if (!isId(id)) return Promise.resolve(null);
   return dbQuery(async () => {
-    const doc = await Application.findById(id).populate("program", "name slug").lean();
+    const doc = await Application.findOne({ _id: id, ...scope }).populate("program", "name slug").lean();
     return doc ? serializeApplication(doc) : null;
   });
 }
@@ -255,9 +263,12 @@ export function listMessages(filter: string | undefined, q: string | undefined, 
 }
 
 /** Badge counts for the College sidebar. */
-export function getCollegeBadges(): Promise<{ messages: number; applications: number }> {
+export function getCollegeBadges(scope: AppScope = {}): Promise<{ messages: number; applications: number }> {
   return dbQuery(async () => {
-    const [messages, applications] = await Promise.all([Contact.countDocuments({ isRead: false }), Application.countDocuments({ status: "pending" })]);
+    const [messages, applications] = await Promise.all([
+      Contact.countDocuments({ isRead: false }),
+      Application.countDocuments({ ...scope, status: "pending" }),
+    ]);
     return { messages, applications };
   });
 }

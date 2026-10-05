@@ -53,6 +53,7 @@ export const staffUserSchema = z.object({
   name: personName(),
   email: emailAddress(),
   role: z.enum(["owner", "admin", "staff"]),
+  wing: z.enum(["all", "boys", "girls"]).default("all"),
   password: z.union([z.literal(""), strongPassword()]).default(""),
   isActive: z.boolean().default(true),
 });

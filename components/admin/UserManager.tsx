@@ -13,7 +13,7 @@ import { Field, PasswordInput, SelectInput, TextInput, applyServerErrors } from 
 import { ConfirmAction, DataTable, StatusBadge, TableEmpty } from "./AdminUI";
 import { deleteStaffUser, saveStaffUser } from "@/actions/admin.actions";
 import { staffUserSchema, type StaffUserInput } from "@/lib/validators/auth.schema";
-import { USER_ROLE_LABELS } from "@/lib/constants";
+import { STAFF_WINGS, STAFF_WING_LABELS, USER_ROLE_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils/formatDate";
 import type { AdminUser, UserRole } from "@/types";
 
@@ -23,7 +23,7 @@ function UserDialog({ user, actorRole, open, onClose }: { user: AdminUser | null
   const roles: UserRole[] = actorRole === "owner" ? ["owner", "admin", "staff"] : ["staff"];
   const { register, control, handleSubmit, setError, formState: { errors } } = useForm<StaffUserInput>({
     resolver: zodResolver(staffUserSchema),
-    values: { name: user?.name ?? "", email: user?.email ?? "", role: user?.role ?? "staff", password: "", isActive: user?.isActive ?? true },
+    values: { name: user?.name ?? "", email: user?.email ?? "", role: user?.role ?? "staff", wing: user?.wing ?? "all", password: "", isActive: user?.isActive ?? true },
   });
 
   const onSubmit = handleSubmit((d) =>
@@ -59,6 +59,15 @@ function UserDialog({ user, actorRole, open, onClose }: { user: AdminUser | null
               {roles.map((r) => (
                 <option key={r} value={r}>
                   {USER_ROLE_LABELS[r]}
+                </option>
+              ))}
+            </SelectInput>
+          </Field>
+          <Field label="Admission records access" htmlFor="u-wing" hint="Girls-wing staff see only girls' applications, documents and photos.">
+            <SelectInput id="u-wing" {...register("wing")}>
+              {STAFF_WINGS.map((w) => (
+                <option key={w} value={w}>
+                  {STAFF_WING_LABELS[w]}
                 </option>
               ))}
             </SelectInput>
@@ -108,7 +117,7 @@ export function UserManager({ users, actorRole, actorId }: { users: AdminUser[];
           <Plus className="size-4" /> New staff account
         </Button>
       </div>
-      <DataTable head={["Name", "Email", "Role", "Status", "Last sign-in", ""]} empty={users.length ? null : <TableEmpty message="No staff accounts." />}>
+      <DataTable head={["Name", "Email", "Role", "Applications", "Status", "Last sign-in", ""]} empty={users.length ? null : <TableEmpty message="No staff accounts." />}>
         {users.map((u) => (
           <tr key={u.id} className="hover:bg-muted/40">
             <td className="px-4 py-3 font-medium">
@@ -117,6 +126,7 @@ export function UserManager({ users, actorRole, actorId }: { users: AdminUser[];
             </td>
             <td className="px-4 py-3">{u.email}</td>
             <td className="px-4 py-3">{USER_ROLE_LABELS[u.role]}</td>
+            <td className="px-4 py-3">{STAFF_WING_LABELS[u.wing]}</td>
             <td className="px-4 py-3">
               <StatusBadge status={u.isActive ? "active" : "inactive"} />
             </td>

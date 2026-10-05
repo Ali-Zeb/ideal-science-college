@@ -27,7 +27,7 @@ function canManage(actor: UserRole, target: UserRole): boolean {
 export async function saveStaffUser(id: string | null, input: unknown): Promise<ActionResult<{ id: string }>> {
   const parsed = staffUserSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
-  const { name, email, role, password, isActive } = parsed.data;
+  const { name, email, role, wing, password, isActive } = parsed.data;
 
   try {
     const session = await requireStaff(ADMIN_ROLES);
@@ -50,6 +50,7 @@ export async function saveStaffUser(id: string | null, input: unknown): Promise<
       user.name = name;
       user.email = email;
       user.role = role;
+      user.wing = wing;
       user.isActive = isActive;
       if (password) user.password = await bcrypt.hash(password, 12);
       await user.save();
@@ -59,7 +60,7 @@ export async function saveStaffUser(id: string | null, input: unknown): Promise<
 
     if (!password) return { success: false, error: "Set an initial password.", fieldErrors: { password: ["Password is required for new users"] } };
     if (await User.exists({ email })) return { success: false, error: "Email already in use.", fieldErrors: { email: ["Another account uses this email"] } };
-    const doc = await User.create({ name, email, role, isActive, password: await bcrypt.hash(password, 12) });
+    const doc = await User.create({ name, email, role, wing, isActive, password: await bcrypt.hash(password, 12) });
     await sendEmail({ to: email, ...staffWelcomeEmail(name, email, USER_ROLE_LABELS[role]) });
     revalidatePath("/admin/users");
     return ok({ id: String(doc._id) }, "User created. Share the password with them in person.");

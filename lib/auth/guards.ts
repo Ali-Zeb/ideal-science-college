@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/db/connect";
 import { Student, User } from "@/lib/db/models";
 import { authOptions } from "./options";
 import { ADMIN_ROLES, COLLEGE_ROLES, STAFF_LOGIN_PATH, STUDENT_LOGIN_PATH } from "./config";
-import type { UserRole } from "@/types";
+import type { StaffWing, UserRole } from "@/types";
 
 export class AuthError extends Error {
   constructor(message = "You are not allowed to perform this action.") {
@@ -22,11 +22,24 @@ export function getSession(): Promise<Session | null> {
 async function isActiveAccount(session: Session): Promise<boolean> {
   await connectDB();
   const model = session.user.kind === "staff" ? User : Student;
-  const doc = await (model as typeof User).findById(session.user.id).select("isActive role").lean();
+  const doc = await (model as typeof User).findById(session.user.id).select("isActive role wing").lean();
   if (!doc || doc.isActive === false) return false;
-  // Pick up role changes made after the token was issued.
-  if (session.user.kind === "staff") session.user.role = doc.role as UserRole;
+  // Pick up role / wing changes made after the token was issued.
+  if (session.user.kind === "staff") {
+    session.user.role = doc.role as UserRole;
+    session.user.wing = (doc.wing ?? "all") as StaffWing;
+  }
   return true;
+}
+
+/**
+ * MongoDB filter limiting admission applications to the staff member's wing.
+ * Girls-wing staff only ever see girls' applications (and vice versa).
+ * @param session - Session returned by requireStaff / guardPage.
+ */
+export function applicationScope(session: Session): { wing?: "boys" | "girls" } {
+  const wing = session.user.wing ?? "all";
+  return wing === "all" ? {} : { wing };
 }
 
 /**

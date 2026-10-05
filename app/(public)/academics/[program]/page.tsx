@@ -14,9 +14,9 @@ import { getFacultyByIds, getProgramBySlug, getPrograms } from "@/lib/data/publi
 import { getSiteSettings } from "@/lib/data/settings";
 import { absoluteUrl, buildMetadata } from "@/lib/utils/seo";
 import { formatCurrency } from "@/lib/utils/formatDate";
-import { REVALIDATE_SECONDS, WING_LABELS } from "@/lib/constants";
+import { WING_LABELS } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 type Props = { params: Promise<{ program: string }> };
 

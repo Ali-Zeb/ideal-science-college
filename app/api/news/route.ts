@@ -17,5 +17,5 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unknown category." }, { status: 400 });
   }
   const data = await getNews(page, limit, category);
-  return NextResponse.json({ ...data, items: data.items.map(({ content: _content, ...rest }) => rest) });
+  return NextResponse.json({ ...data, items: data.items.map((item) => ({ ...item, content: undefined })) });
 }

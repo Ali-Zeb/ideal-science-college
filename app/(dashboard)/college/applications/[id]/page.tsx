@@ -8,7 +8,7 @@ import { ApplicationReview } from "@/components/admin/ApplicationReview";
 import { PrintButton } from "@/components/admin/PrintButton";
 import { deleteApplication } from "@/actions/application.actions";
 import { getApplication } from "@/lib/data/dashboard";
-import { getSession } from "@/lib/auth/guards";
+import { applicationScope, requireStaff } from "@/lib/auth/guards";
 import { ADMIN_ROLES } from "@/lib/auth/config";
 import { formatDate, formatDateTime } from "@/lib/utils/formatDate";
 import { APPLICATION_STATUS_LABELS, SITE } from "@/lib/constants";
@@ -33,9 +33,10 @@ function Rows({ rows }: { rows: [string, string | number | null][] }) {
 
 export default async function ApplicationDetailPage({ params }: Props) {
   const { id } = await params;
-  const [app, session] = await Promise.all([getApplication(id), getSession()]);
+  const session = await requireStaff();
+  const app = await getApplication(id, applicationScope(session));
   if (!app) notFound();
-  const isAdmin = ADMIN_ROLES.includes(session?.user.role as UserRole);
+  const isAdmin = ADMIN_ROLES.includes(session.user.role as UserRole);
   const docs = [
     ["B-Form / CNIC", app.documents.cnic],
     ["Result card", app.documents.marksheet],

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DashboardShell } from "@/components/layout/DashboardShell";
-import { guardPage } from "@/lib/auth/guards";
+import { applicationScope, guardPage } from "@/lib/auth/guards";
 import { ADMIN_ROLES } from "@/lib/auth/config";
 import { getCollegeBadges } from "@/lib/data/dashboard";
 import { USER_ROLE_LABELS } from "@/lib/constants";
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CollegeLayout({ children }: { children: React.ReactNode }) {
   const session = await guardPage("college");
-  const badges = await getCollegeBadges();
+  const badges = await getCollegeBadges(applicationScope(session));
   const role = session.user.role as UserRole;
   return (
     <DashboardShell

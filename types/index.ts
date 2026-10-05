@@ -1,4 +1,4 @@
-import type { APPLICATION_STATUSES, PROGRAM_LEVELS, USER_ROLES, WINGS } from "@/lib/constants";
+import type { APPLICATION_STATUSES, PROGRAM_LEVELS, STAFF_WINGS, USER_ROLES, WINGS } from "@/lib/constants";
 
 export * from "./news";
 export * from "./event";
@@ -8,6 +8,7 @@ export type UserRole = (typeof USER_ROLES)[number];
 export type ProgramLevel = (typeof PROGRAM_LEVELS)[number];
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 export type Wing = (typeof WINGS)[number];
+export type StaffWing = (typeof STAFF_WINGS)[number];
 
 /** Serialized (client-safe) shapes: ObjectIds become strings, Dates become ISO strings. */
 
@@ -16,6 +17,7 @@ export interface AdminUser {
   name: string;
   email: string;
   role: UserRole;
+  wing: StaffWing;
   isActive: boolean;
   lastLogin: string | null;
   createdAt: string;

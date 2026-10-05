@@ -43,8 +43,8 @@ export default async function PrivacyPage() {
 
           <h2>3. Girls&apos; information</h2>
           <p>
-            Respecting the privacy of our female students is important to us. Photographs and documents of girls are accessed only by authorised
-            staff of the girls wing and the admissions office, and are never published on the website.
+            Respecting the privacy of our female students is important to us. Applications, documents and photographs of girls are visible only to
+            staff accounts assigned to the girls wing and to the principal&apos;s office, and are never published on the website.
           </p>
 
           <h2>4. Service providers</h2>

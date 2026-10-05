@@ -25,7 +25,7 @@ const faqs = [
     group: "Girls wing",
     items: [
       ["Are boys and girls taught separately?", "Yes. Boys and girls study in separate wings. The girls wing is taught and managed by female teachers in a purdah-observing environment."],
-      ["Who can see my daughter's documents and photo?", "Documents are visible only to authorised admissions staff. Girls' photographs are handled by female staff of the girls wing."],
+      ["Who can see my daughter's documents and photo?", "Documents are visible only to authorised admissions staff. Girls' applications, documents and photographs are visible only to girls-wing staff and the principal's office."],
     ],
   },
   {

@@ -8,10 +8,10 @@ import { CTASection } from "@/components/home/CTASection";
 import { getPrograms } from "@/lib/data/public";
 import { getSiteSettings } from "@/lib/data/settings";
 import { buildMetadata } from "@/lib/utils/seo";
-import { LEVEL_GROUPS, REVALIDATE_SECONDS } from "@/lib/constants";
+import { LEVEL_GROUPS } from "@/lib/constants";
 import type { ProgramItem } from "@/types";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   title: "Programs — School & College",

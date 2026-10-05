@@ -29,6 +29,7 @@ Next.js 15 (App Router) · TypeScript (strict) · Tailwind CSS v4 + shadcn/ui ·
 - Passwords hashed with bcrypt (12 rounds); strong-password policy.
 - Login rate limiting (5 attempts / 15 min per IP + email), stored in MongoDB so it works on serverless.
 - Role-based access in middleware **and** in every server action.
+- Wing-based access to admission records: each staff account is set to Both wings, Boys wing only or Girls wing only; girls-wing staff see only girls’ applications, documents and photos (list, detail, CSV export, counts and status changes).
 - Strict per-field validation on client and server: names accept letters only, Pakistani mobile numbers only, 13-digit CNIC/B-Form, marks cannot exceed totals, uploads checked by file signature (JPG/PNG/WEBP/PDF, max 5 MB).
 - Rich text sanitized with DOMPurify; CSV export protected against formula injection; security headers set in `next.config.ts`.
 
@@ -127,6 +128,10 @@ The starter content is realistic but must be confirmed by the college before lau
 - [ ] Social media links (Admin → Site settings)
 - [ ] Testimonials on the homepage (`components/home/TestimonialsSection.tsx`)
 - [ ] Photos: only publish photos of female students with family consent
+
+## Client user guide
+
+A step-by-step guide for the principal and office staff (dashboards, admissions, content, settings, privacy rules) is shared separately as a document: https://claude.ai/code/artifact/0b06230e-8817-4f34-af76-e0502d45a10a
 
 ## Support
 

@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/db/connect";
 import { Application, Program, nextSequence } from "@/lib/db/models";
 import { applicationSchema, applicationStatusSchema } from "@/lib/validators/application.schema";
 import { ADMIN_ROLES } from "@/lib/auth/config";
-import { requireStaff, requireStudent, toErrorMessage } from "@/lib/auth/guards";
+import { applicationScope, requireStaff, requireStudent, toErrorMessage } from "@/lib/auth/guards";
 import { emailDomainAcceptsMail } from "@/lib/email/verify-domain";
 import { adminInbox, sendEmail } from "@/lib/email/send";
 import { applicationAdminEmail, applicationReceivedEmail, applicationStatusEmail } from "@/lib/email/templates";
@@ -103,8 +103,8 @@ export async function updateApplicationStatus(input: unknown): Promise<ActionRes
     await connectDB();
     const { id, status, reviewNote, notify } = parsed.data;
 
-    const doc = await Application.findByIdAndUpdate(
-      id,
+    const doc = await Application.findOneAndUpdate(
+      { _id: id, ...applicationScope(session) },
       { $set: { status, reviewNote, reviewedBy: session.user.id, reviewedAt: new Date() } },
       { new: true },
     ).lean();
@@ -129,9 +129,10 @@ export async function updateApplicationStatus(input: unknown): Promise<ActionRes
 export async function deleteApplication(id: string): Promise<ActionResult<null>> {
   if (!/^[a-f\d]{24}$/i.test(id)) return fail("Invalid application.");
   try {
-    await requireStaff(ADMIN_ROLES);
+    const session = await requireStaff(ADMIN_ROLES);
     await connectDB();
-    await Application.deleteOne({ _id: id });
+    const res = await Application.deleteOne({ _id: id, ...applicationScope(session) });
+    if (!res.deletedCount) return fail("Application not found.");
     revalidatePath("/college/applications");
     return ok(null, "Application deleted.");
   } catch (error) {

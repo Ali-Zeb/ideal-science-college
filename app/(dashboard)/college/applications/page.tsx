@@ -3,6 +3,7 @@ import { Download, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable, FilterTabs, PageHeader, SearchBox, StatusBadge, TableEmpty, TablePagination } from "@/components/admin/AdminUI";
 import { listApplications } from "@/lib/data/dashboard";
+import { applicationScope, requireStaff } from "@/lib/auth/guards";
 import { formatDate } from "@/lib/utils/formatDate";
 import { APPLICATION_STATUSES, APPLICATION_STATUS_LABELS } from "@/lib/constants";
 
@@ -11,8 +12,9 @@ export const metadata = { title: "Applications" };
 type Props = { searchParams: Promise<{ q?: string; status?: string; wing?: string; page?: string }> };
 
 export default async function ApplicationsPage({ searchParams }: Props) {
-  const sp = await searchParams;
-  const data = await listApplications(sp);
+  const [sp, session] = await Promise.all([searchParams, requireStaff()]);
+  const scope = applicationScope(session);
+  const data = await listApplications(sp, scope);
   const total = Object.values(data.counts).reduce((n, c) => n + c, 0);
   const exportQuery = new URLSearchParams(Object.entries(sp).filter(([k, v]) => v && k !== "page") as [string, string][]).toString();
 
@@ -36,14 +38,16 @@ export default async function ApplicationsPage({ searchParams }: Props) {
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SearchBox placeholder="Search name, CNIC, phone or number" />
-          <FilterTabs
-            param="wing"
-            options={[
-              { value: "", label: "Both wings" },
-              { value: "boys", label: "Boys wing" },
-              { value: "girls", label: "Girls wing" },
-            ]}
-          />
+          {scope.wing ? null : (
+            <FilterTabs
+              param="wing"
+              options={[
+                { value: "", label: "Both wings" },
+                { value: "boys", label: "Boys wing" },
+                { value: "girls", label: "Girls wing" },
+              ]}
+            />
+          )}
         </div>
       </div>
       <DataTable

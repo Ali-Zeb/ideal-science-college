@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireStaff, AuthError } from "@/lib/auth/guards";
+import { applicationScope, requireStaff, AuthError } from "@/lib/auth/guards";
 import { exportApplications } from "@/lib/data/dashboard";
 import { APPLICATION_STATUS_LABELS } from "@/lib/constants";
 
@@ -17,15 +17,16 @@ const csvCell = (v: unknown) => {
  * Accepts the same filters as the dashboard list: `q`, `status`, `wing`, `program`.
  */
 export async function GET(req: Request) {
+  let scope: { wing?: "boys" | "girls" };
   try {
-    await requireStaff();
+    scope = applicationScope(await requireStaff());
   } catch (error) {
     const status = error instanceof AuthError ? 403 : 500;
     return NextResponse.json({ error: "Not allowed." }, { status });
   }
 
   const sp = Object.fromEntries(new URL(req.url).searchParams);
-  const rows = await exportApplications(sp);
+  const rows = await exportApplications(sp, scope);
   const header = [
     "Application No",
     "Submitted",

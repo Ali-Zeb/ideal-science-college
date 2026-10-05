@@ -1,5 +1,5 @@
 import type { DefaultSession } from "next-auth";
-import type { UserRole } from "@/types";
+import type { StaffWing, UserRole } from "@/types";
 
 type AccountKind = "staff" | "student";
 
@@ -9,6 +9,8 @@ declare module "next-auth" {
       id: string;
       kind: AccountKind;
       role: UserRole | "student";
+      /** Set by server guards from the database (staff only). */
+      wing?: StaffWing;
     } & DefaultSession["user"];
   }
 

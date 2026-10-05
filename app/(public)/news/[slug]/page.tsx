@@ -11,9 +11,9 @@ import { getNewsBySlug, getRelatedNews, incrementNewsViews } from "@/lib/data/pu
 import { sanitizeHtml } from "@/lib/sanitize";
 import { absoluteUrl, buildMetadata } from "@/lib/utils/seo";
 import { formatDate } from "@/lib/utils/formatDate";
-import { REVALIDATE_SECONDS, SITE } from "@/lib/constants";
+import { SITE } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 type Props = { params: Promise<{ slug: string }> };
 

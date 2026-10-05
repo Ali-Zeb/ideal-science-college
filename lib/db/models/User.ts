@@ -1,5 +1,5 @@
 import { Schema, model, models, type InferSchemaType, type Model } from "mongoose";
-import { USER_ROLES } from "@/lib/constants";
+import { STAFF_WINGS, USER_ROLES } from "@/lib/constants";
 
 const UserSchema = new Schema(
   {
@@ -7,6 +7,8 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: USER_ROLES, default: "staff", required: true },
+    /** Which admission records this account may see: girls-wing staff see only girls' applications. */
+    wing: { type: String, enum: STAFF_WINGS, default: "all" },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date },
   },

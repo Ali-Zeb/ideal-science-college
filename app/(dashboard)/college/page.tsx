@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { PageHeader, Panel, StatCard, StatusBadge } from "@/components/admin/AdminUI";
 import { BreakdownDonut, WeeklyApplicationsChart } from "@/components/admin/Charts";
 import { getCollegeOverview } from "@/lib/data/dashboard";
+import { applicationScope, requireStaff } from "@/lib/auth/guards";
+import { STAFF_WING_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils/formatDate";
 import { APPLICATION_STATUS_LABELS } from "@/lib/constants";
 
 export const metadata = { title: "Dashboard" };
 
 export default async function CollegeHome({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
-  const [data, { denied }] = await Promise.all([getCollegeOverview(), searchParams]);
+  const session = await requireStaff();
+  const [data, { denied }] = await Promise.all([getCollegeOverview(applicationScope(session)), searchParams]);
+  const wing = session.user.wing ?? "all";
   const s = data.applications.byStatus;
 
   return (
@@ -22,7 +26,7 @@ export default async function CollegeHome({ searchParams }: { searchParams: Prom
       ) : null}
       <PageHeader
         title="College Dashboard"
-        description="Admissions, messages and content at a glance."
+        description={`Admissions, messages and content at a glance.${wing === "all" ? "" : ` Showing applications for: ${STAFF_WING_LABELS[wing]}.`}`}
         action={
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline">

@@ -3,9 +3,9 @@ import { JsonLd } from "@/components/common/SEO";
 import { EventsBrowser } from "@/components/common/EventsBrowser";
 import { getAllEvents } from "@/lib/data/public";
 import { absoluteUrl, buildMetadata } from "@/lib/utils/seo";
-import { REVALIDATE_SECONDS, SITE } from "@/lib/constants";
+import { SITE } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   title: "Events Calendar",

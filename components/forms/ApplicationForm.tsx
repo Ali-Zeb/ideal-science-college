@@ -321,7 +321,7 @@ export function ApplicationForm({ programs, defaultProgramSlug, account }: Appli
                   )}
                 />
                 <p className="self-center text-sm text-muted-foreground">
-                  Documents are stored securely and seen only by the admissions office. Girls&apos; photos are viewed only by female staff of the girls wing.
+                  Documents are stored securely and seen only by authorised admissions staff. Girls&apos; applications, documents and photos are visible only to girls-wing staff and the principal&apos;s office.
                 </p>
               </div>
             ) : null}

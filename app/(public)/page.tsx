@@ -13,9 +13,8 @@ import { JsonLd, collegeJsonLd } from "@/components/common/SEO";
 import { getFaculty, getGalleryAlbums, getLatestNews, getPrograms, getUpcomingEvents } from "@/lib/data/public";
 import { getSiteSettings } from "@/lib/data/settings";
 import { buildMetadata } from "@/lib/utils/seo";
-import { REVALIDATE_SECONDS } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   path: "/",

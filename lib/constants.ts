@@ -139,6 +139,14 @@ export const APPLICATION_STATUS_LABELS: Record<(typeof APPLICATION_STATUSES)[num
 
 export const USER_ROLES = ["owner", "admin", "staff"] as const;
 
+/** Application-access scope for a staff account. */
+export const STAFF_WINGS = ["all", "boys", "girls"] as const;
+export const STAFF_WING_LABELS: Record<(typeof STAFF_WINGS)[number], string> = {
+  all: "Both wings",
+  boys: "Boys wing only",
+  girls: "Girls wing only",
+};
+
 export const USER_ROLE_LABELS: Record<(typeof USER_ROLES)[number], string> = {
   owner: "Owner",
   admin: "Administrator",
@@ -148,8 +156,6 @@ export const USER_ROLE_LABELS: Record<(typeof USER_ROLES)[number], string> = {
 export const ITEMS_PER_PAGE = 9;
 export const ADMIN_PAGE_SIZE = 15;
 
-/** Revalidation window (seconds) for ISR pages backed by the database. */
-export const REVALIDATE_SECONDS = 300;
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 export const ALLOWED_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"] as const;

@@ -46,6 +46,7 @@ export function serializeUser(doc: WithId<UserDoc>): AdminUser {
     name: doc.name,
     email: doc.email,
     role: doc.role as AdminUser["role"],
+    wing: (doc.wing ?? "all") as AdminUser["wing"],
     isActive: doc.isActive ?? true,
     lastLogin: isoOrNull(doc.lastLogin),
     createdAt: iso(doc.createdAt),

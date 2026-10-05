@@ -11,9 +11,8 @@ import { getPrograms } from "@/lib/data/public";
 import { getSiteSettings } from "@/lib/data/settings";
 import { buildMetadata } from "@/lib/utils/seo";
 import { formatCurrency } from "@/lib/utils/formatDate";
-import { REVALIDATE_SECONDS } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   title: "Admissions",

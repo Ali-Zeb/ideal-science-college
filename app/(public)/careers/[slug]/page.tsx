@@ -8,9 +8,9 @@ import { JobApplicationForm } from "@/components/forms/JobApplicationForm";
 import { getJobBySlug } from "@/lib/data/public";
 import { buildMetadata } from "@/lib/utils/seo";
 import { formatDate } from "@/lib/utils/formatDate";
-import { CONTACT_DEFAULTS, REVALIDATE_SECONDS, SITE } from "@/lib/constants";
+import { CONTACT_DEFAULTS, SITE } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 type Props = { params: Promise<{ slug: string }> };
 

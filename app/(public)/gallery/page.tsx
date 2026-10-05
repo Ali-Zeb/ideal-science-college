@@ -4,9 +4,8 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { GalleryBrowser } from "@/components/common/GalleryBrowser";
 import { getGalleryAlbums } from "@/lib/data/public";
 import { buildMetadata } from "@/lib/utils/seo";
-import { REVALIDATE_SECONDS } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   title: "Photo Gallery",

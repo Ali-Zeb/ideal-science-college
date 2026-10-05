@@ -7,9 +7,8 @@ import { StaggerChildren, StaggerItem } from "@/components/animations/StaggerChi
 import { getOpenJobs } from "@/lib/data/public";
 import { buildMetadata } from "@/lib/utils/seo";
 import { formatDate } from "@/lib/utils/formatDate";
-import { REVALIDATE_SECONDS } from "@/lib/constants";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   title: "Careers — Teaching Jobs",

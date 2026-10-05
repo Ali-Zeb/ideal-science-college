@@ -7,10 +7,10 @@ import { Pagination } from "@/components/common/Pagination";
 import { StaggerChildren, StaggerItem } from "@/components/animations/StaggerChildren";
 import { getNews } from "@/lib/data/public";
 import { buildMetadata } from "@/lib/utils/seo";
-import { ITEMS_PER_PAGE, NEWS_CATEGORIES, REVALIDATE_SECONDS } from "@/lib/constants";
+import { ITEMS_PER_PAGE, NEWS_CATEGORIES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 300; // seconds — must be a literal for Next.js segment config
 
 export const metadata = buildMetadata({
   title: "News & Announcements",
